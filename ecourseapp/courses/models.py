@@ -5,14 +5,7 @@ from cloudinary.models import CloudinaryField
 
 
 class User(AbstractUser):
-    pass
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
+    avatar = CloudinaryField(null=True)
 
 
 class BaseModel(models.Model):
@@ -24,6 +17,14 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class Category(BaseModel):
+    name = models.CharField(max_length=255, unique=True)
+    icon = models.CharField(max_length=20, default='tag')
+
+    def __str__(self):
+        return self.name
+
+
 class Tag(BaseModel):
     name = models.CharField(max_length=50, unique=True)
 
@@ -32,20 +33,38 @@ class Tag(BaseModel):
 
 
 class Course(BaseModel):
-    name = models.CharField(max_length=50)
-    description = RichTextField(null=True)
+    name = models.CharField(max_length=255)
+    description = RichTextField()
     image = CloudinaryField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
 
 
 class Lesson(BaseModel):
-    subject = models.CharField(max_length=50)
-    content = RichTextField(null=True)
-    image = CloudinaryField()
+    subject = models.CharField(max_length=255)
+    content = RichTextField()
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    tags = models.ManyToManyField(Tag)
+    image = CloudinaryField()
+    tags = models.ManyToManyField(Tag, null=True, blank=True)
+
+    def __str__(self):
+        return self.subject
 
 
+class Interaction(BaseModel):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class Comment(Interaction):
+    content = models.CharField(max_length=255)
+
+
+class Like(Interaction):
+    class Meta:
+        unique_together = ('lesson', 'user')
