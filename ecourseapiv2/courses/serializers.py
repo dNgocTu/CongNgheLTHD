@@ -43,12 +43,6 @@ class LessonDetailsSerializer(LessonSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['avatar'] = instance.avatar.url
-
-        return rep
-
     def create(self, validated_data):
         data = validated_data.copy()
 

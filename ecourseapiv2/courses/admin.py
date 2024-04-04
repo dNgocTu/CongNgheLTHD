@@ -5,6 +5,9 @@ from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 
+# admin   123456
+
+
 class CourseForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditorUploadingWidget)
 
